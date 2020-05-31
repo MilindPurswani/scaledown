@@ -21,7 +21,7 @@ func main() {
 
 	// cli for -params-only flag
 	var paramsonly bool
-	flag.BoolVar(&paramsonly, "params-only", false, "don't include subdomains of the target domain")
+	flag.BoolVar(&paramsonly, "params-only", false, "include params-only if you want")
 
 	flag.Parse()
 
