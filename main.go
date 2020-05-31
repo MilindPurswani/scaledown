@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"log"
 	"net/url"
@@ -17,6 +18,13 @@ func main() {
 	// Unique url list
 	uu := urlList{}
 	sc := bufio.NewScanner(os.Stdin)
+
+	// cli for -params-only flag
+	var paramsonly bool
+	flag.BoolVar(&paramsonly, "params-only", false, "don't include subdomains of the target domain")
+
+	flag.Parse()
+
 	for sc.Scan() {
 		urls = append(urls, sc.Text())
 	}
@@ -30,12 +38,24 @@ func main() {
 			//fmt.Fprintf(os.Stderr, "Invalid Character encountered at %s\n", err)
 			continue
 		}
+		// query params
+		qp := u.Query()
+		// fragments
+		f := u.Fragment
 		// escaped urls
 		eu := u.Scheme + "://" + u.Hostname() + u.RequestURI()
 		_, found := find(uu, eu)
 		if !found {
-			uu = append(uu, eu)
-			fmt.Println(eu)
+			// check if params-only flag is set
+			if paramsonly {
+				if len(qp) > 0 || len(f) > 0 {
+					uu = append(uu, eu)
+					fmt.Println(eu)
+				}
+			} else {
+				uu = append(uu, eu)
+				fmt.Println(eu)
+			}
 		} else {
 			// TODO: call checkParams()
 
